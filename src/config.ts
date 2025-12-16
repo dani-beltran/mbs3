@@ -63,7 +63,7 @@ function buildMongoUri(): string {
 
   // Add authSource if specified
   if (process.env.MONGO_AUTH_SOURCE) {
-    queryParams = `authSource=${process.env.MONGO_AUTH_SOURCE}`;
+    queryParams = `?authSource=${process.env.MONGO_AUTH_SOURCE}`;
   }
-  return `mongodb${srv}://${auth}${host}/?${queryParams}`;
+  return `mongodb${srv}://${auth}${host}/${queryParams}`;
 }
