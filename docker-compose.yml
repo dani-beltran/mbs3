@@ -16,7 +16,7 @@ services:
   backup:
     build: .
     container_name: mongodb-backup-runner
-    entrypoint: ["/bin/bash", "-c", "cd /app && node dist/index.js dump"]
+    entrypoint: ["/bin/bash", "-c", "node /app/dist/index.js dump"]
     depends_on:
       - mongodb
     environment:
