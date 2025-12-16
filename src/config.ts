@@ -29,9 +29,15 @@ function getEnvOrThrow(key: string): string {
 }
 
 export function loadConfig(): Config {
+  let auth = '';
+
+  if (process.env.MONGO_INITDB_ROOT_USERNAME) {
+    auth = `${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@`;
+  }
+
   return {
     mongodb: {
-      uri: `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGODB_HOST || "localhost:27017"}`,
+      uri: `mongodb://${auth}${process.env.MONGODB_HOST || "localhost:27017"}`,
       database: getEnvOrThrow("MONGODB_DATABASE"),
     },
     aws: {

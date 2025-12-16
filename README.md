@@ -43,7 +43,6 @@ Edit `.env` with your configuration:
 
 ```env
 # MongoDB connection
-MONGODB_URI=mongodb://localhost:27017
 MONGODB_DATABASE=your_database_name
 
 # AWS S3 Configuration
