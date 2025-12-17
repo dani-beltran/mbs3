@@ -173,6 +173,34 @@ npx mbs3 list --bucket my-backup-bucket
 npx mbs3 list --prefix backups/production
 ```
 
+### Prune (Delete Old Backups)
+
+Delete backups older than a specified number of days:
+
+```bash
+npx mbs3 prune
+```
+
+**Options:**
+- `-d, --days <number>` - Delete backups older than this many days (default: 14, or PRUNE_DAYS env var)
+- `--dry-run` - Preview what would be deleted without actually deleting
+- `-B, --bucket <name>` - S3 bucket name (overrides S3_BUCKET env var)
+- `-P, --prefix <path>` - S3 prefix path (overrides S3_PREFIX env var)
+
+```bash
+# Prune backups older than 14 days (default)
+npx mbs3 prune
+
+# Prune backups older than 7 days
+npx mbs3 prune --days 7
+
+# Preview what would be deleted (dry run)
+npx mbs3 prune --dry-run
+
+# Prune from a specific bucket and prefix
+npx mbs3 prune --bucket my-backup-bucket --prefix backups/production
+```
+
 ### Version
 
 Check the installed version:
