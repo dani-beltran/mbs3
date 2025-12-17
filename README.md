@@ -1,5 +1,7 @@
 # mbs3 - MongoDB Backup to S3 storage
 
+[![npm version](https://img.shields.io/npm/v/mbs3.svg)](https://www.npmjs.com/package/mbs3)
+
 A CLI tool to backup and restore MongoDB databases using `mongodump`/`mongorestore` and Amazon S3.
 
 ## Prerequisites
