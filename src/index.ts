@@ -4,6 +4,14 @@ import { runListBackups } from "./commands/list";
 import { runRestore } from "./commands/restore";
 import { runDump } from "./commands/dump";
 
+// Get package version dynamically
+const packageJson = require("../package.json");
+
+program
+  .name("mongodb-backup-s3")
+  .description("CLI tool to backup and restore MongoDB databases using S3 as storage")
+  .version(packageJson.version, "-v, --version", "Output the current version");
+
 program
   .command("dump")
   .description("Create a backup of the MongoDB database and upload to S3")

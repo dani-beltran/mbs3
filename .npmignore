@@ -1,0 +1,28 @@
+# Source files (we publish compiled dist)
+src/
+
+# Development files
+.env
+.env.local
+*.log
+.git/
+.github/
+.gitignore
+
+# Test and backup directories
+backups/
+restores/
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# TypeScript
+tsconfig.json
+*.ts
+!*.d.ts
+
+# Other
+*.md
+!README.md

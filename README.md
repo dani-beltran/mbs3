@@ -1,12 +1,12 @@
 # MongoDB Backup to S3
 
-A CLI tool to backup MongoDB databases using `mongodump` and upload the backups to Amazon S3.
+A CLI tool to backup and restore MongoDB databases using `mongodump`/`mongorestore` and Amazon S3.
 
 ## Prerequisites
 
 - Node.js 18+
-- MongoDB Database Tools (`mongodump`) installed and available in PATH
-- AWS credentials with S3 write access
+- MongoDB Database Tools (`mongodump`, `mongorestore`) installed and available in PATH
+- AWS credentials with S3 read/write access
 
 ### Installing MongoDB Database Tools
 
@@ -27,53 +27,144 @@ The mongodump tool is included in the official MongoDB images.
 
 ## Installation
 
+### Using npx (no installation required)
+
+You can run commands directly without installing:
+
 ```bash
-npm install
+npx mongodb-backup-s3 dump
+npx mongodb-backup-s3 restore
+npx mongodb-backup-s3 list
+```
+
+Or use the shorter alias:
+
+```bash
+npx mbs3 dump
+npx mbs3 restore
+npx mbs3 list
+```
+
+### Global Installation
+
+Install globally to use anywhere:
+
+```bash
+npm install -g mongodb-backup-s3
+```
+
+Then use directly:
+
+```bash
+mongodb-backup-s3 dump
+mongodb-backup-s3 restore
+mongodb-backup-s3 list
+
+# Or with the short alias
+mbs3 dump
+mbs3 restore
+mbs3 list
+```
+
+### Local Installation
+
+```bash
+npm install mongodb-backup-s3
 ```
 
 ## Configuration
 
-Copy the example environment file and configure your settings:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
+Create a `.env` file in the directory where you run the command:
 
 ```env
-# MongoDB connection
+# MongoDB connection (required)
+MONGODB_URI=mongodb://username:password@localhost:27017
 MONGODB_DATABASE=your_database_name
 
-# AWS S3 Configuration
+# AWS S3 Configuration (required)
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=us-east-1
 S3_BUCKET=your-backup-bucket
+
+# Optional: AWS region (default: us-east-1)
+AWS_REGION=us-east-1
 S3_PREFIX=backups/mongodb
 
-# Optional: Custom mongodump path
+# Optional: Custom S3-compatible endpoint (e.g., MinIO, DigitalOcean Spaces)
+# AWS_ENDPOINT=https://your-custom-endpoint.com
+
+# Optional: Custom mongodump/mongorestore path (if not in PATH)
 # MONGODUMP_PATH=/usr/local/bin/mongodump
 ```
 
-## Usage
+## Commands
 
-### Run a backup
+### Dump (Create Backup)
+
+Create a backup of the MongoDB database and upload to S3:
 
 ```bash
-npm run dump
+npx mbs3 dump
 ```
 
-### Keep local backup files
+**Options:**
+- `-k, --keep-local` - Keep local backup files after upload
 
 ```bash
-npm run dump -- --keep-local
+npx mbs3 dump --keep-local
 ```
 
-### Development mode
+### Restore
+
+Restore a MongoDB database from an S3 backup:
 
 ```bash
-npm run dev
+npx mbs3 restore
+```
+
+**Options:**
+- `-b, --backup <name>` - Specific backup folder name to restore (defaults to most recent)
+- `-d, --drop` - Drop existing collections before restore
+- `-k, --keep-local` - Keep downloaded backup files after restore
+
+```bash
+# Restore most recent backup
+npx mbs3 restore
+
+# Restore specific backup
+npx mbs3 restore --backup mydb-2024-01-15T10-30-00-000Z
+
+# Drop existing collections and restore
+npx mbs3 restore --drop
+
+# Keep downloaded files after restore
+npx mbs3 restore --keep-local
+```
+
+### List Backups
+
+List all available backups in S3:
+
+```bash
+npx mbs3 list
+```
+
+### Version
+
+Check the installed version:
+
+```bash
+npx mbs3 --version
+```
+
+### Help
+
+Get help for any command:
+
+```bash
+npx mbs3 --help
+npx mbs3 dump --help
+npx mbs3 restore --help
 ```
 
 ## Output
@@ -118,16 +209,28 @@ docker compose up -d mongodb
 docker compose --profile backup run --rm backup
 ```
 
-## Restoring from Backup
+## Development
 
-Download the backup from S3 and use `mongorestore`:
+### Local Development
 
 ```bash
-# Download from S3
-aws s3 cp --recursive s3://your-bucket/backups/mongodb/your_database-2024-01-15T10-30-00-000Z/ ./restore/
+# Install dependencies
+npm install
 
-# Restore to MongoDB
-mongorestore --uri "mongodb://localhost:27017" --gzip ./restore/
+# Run in development mode
+npm run dev dump
+npm run dev restore
+npm run dev list
+
+# Build the project
+npm run build
+```
+
+### Publishing to npm
+
+```bash
+# Build and publish
+npm publish
 ```
 
 ## License

@@ -31,7 +31,7 @@ function getEnvOrThrow(key: string): string {
 export function loadConfig(): Config {
   return {
     mongodb: {
-      uri: buildMongoUri(),
+      uri: getEnvOrThrow("MONGODB_URI"),
       database: getEnvOrThrow("MONGODB_DATABASE"),
     },
     aws: {
@@ -46,24 +46,4 @@ export function loadConfig(): Config {
     },
     mongodumpPath: process.env.MONGODUMP_PATH || "mongodump",
   };
-}
-
-function buildMongoUri(): string {
-  let auth = '';
-  let host = process.env.MONGODB_HOST || 'localhost:27017';
-  host = host.endsWith('/') ? host.slice(0, -1) : host;
-  let srv = process.env.MONGO_SRV ? '+srv' : '';
-  let queryParams = '';
-
-  if (process.env.MONGO_INITDB_ROOT_USERNAME) {
-    const username = encodeURIComponent(process.env.MONGO_INITDB_ROOT_USERNAME);
-    const password = encodeURIComponent(process.env.MONGO_INITDB_ROOT_PASSWORD || '');
-    auth = `${username}:${password}@`;
-  }
-
-  // Add authSource if specified
-  if (process.env.MONGO_AUTH_SOURCE) {
-    queryParams = `?authSource=${process.env.MONGO_AUTH_SOURCE}`;
-  }
-  return `mongodb${srv}://${auth}${host}/${queryParams}`;
 }
