@@ -18,12 +18,15 @@ brew install mongodb-database-tools
 
 **Ubuntu/Debian:**
 ```bash
-wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.0.deb
-sudo dpkg -i mongodb-database-tools-ubuntu2204-x86_64-100.9.0.deb
+wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.14.0.deb
+sudo dpkg -i mongodb-database-tools-ubuntu2204-x86_64-100.14.0.deb
 ```
 
 **Docker:**
 The mongodump tool is included in the official MongoDB images.
+
+**Other platforms:**
+Refer to the [official MongoDB documentation](https://www.mongodb.com/docs/database-tools/installation/installation/) for installation instructions.
 
 ## Installation
 
