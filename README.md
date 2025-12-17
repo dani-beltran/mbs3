@@ -16,7 +16,7 @@ brew tap mongodb/brew
 brew install mongodb-database-tools
 ```
 
-**Ubuntu/Debian:**
+**Ubuntu/Debian (amd64):**
 ```bash
 wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.14.0.deb
 sudo dpkg -i mongodb-database-tools-ubuntu2204-x86_64-100.14.0.deb
