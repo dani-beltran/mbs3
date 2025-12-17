@@ -3,12 +3,13 @@ import { program } from "commander";
 import { runListBackups } from "./commands/list";
 import { runRestore } from "./commands/restore";
 import { runDump } from "./commands/dump";
+import { runPrune } from "./commands/prune";
 
 // Get package version dynamically
 const packageJson = require("../package.json");
 
 program
-  .name("mongodb-backup-s3")
+  .name("mbs3")
   .description("CLI tool to backup and restore MongoDB databases using S3 as storage")
   .version(packageJson.version, "-v, --version", "Output the current version");
 
@@ -38,5 +39,14 @@ program
   .option("-B, --bucket <name>", "S3 bucket name (overrides S3_BUCKET env var)")
   .option("-P, --prefix <path>", "S3 prefix path (overrides S3_PREFIX env var)")
   .action(runListBackups);
+
+program
+  .command("prune")
+  .description("Delete backups older than a specified number of days")
+  .option("-d, --days <number>", "Number of days to keep (overrides PRUNE_DAYS env var, default: 14)", parseInt)
+  .option("-B, --bucket <name>", "S3 bucket name (overrides S3_BUCKET env var)")
+  .option("-P, --prefix <path>", "S3 prefix path (overrides S3_PREFIX env var)")
+  .option("--dry-run", "Show what would be deleted without actually deleting", false)
+  .action(runPrune);
 
 program.parse();
