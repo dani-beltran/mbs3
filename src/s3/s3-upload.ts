@@ -48,13 +48,21 @@ export async function uploadToS3(
     },
   });
 
-  const files = getAllFiles(dumpResult.outputPath);
+  let dirPath = dumpResult.outputPath;
+  let files: string[] = [];
   let totalSize = 0;
+
+  if (isDir(dumpResult.outputPath)) {
+    files = getAllFiles(dumpResult.outputPath);
+  } else {
+    files = [dumpResult.outputPath];
+    dirPath = path.dirname(dumpResult.outputPath);
+  }
 
   console.log(`☁️  Uploading ${files.length} files to S3...`);
 
   for (const filePath of files) {
-    const relativePath = path.relative(dumpResult.outputPath, filePath);
+    const relativePath = path.relative(dirPath, filePath);
     const s3Key = `${config.s3.prefix}/${dumpResult.databaseName}-${dumpResult.timestamp}/${relativePath}`;
 
     const fileStats = fs.statSync(filePath);
@@ -90,4 +98,12 @@ export async function uploadToS3(
     totalFiles: files.length,
     totalSize,
   };
+}
+
+function isDir(path: string): boolean {
+  try {
+    return fs.statSync(path).isDirectory();
+  } catch (err) {
+    return false;
+  }
 }
