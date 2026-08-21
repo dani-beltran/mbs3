@@ -9,6 +9,20 @@ export interface DumpResult {
   timestamp: string;
 }
 
+function directoryContainsFiles(dirPath: string): boolean {
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    if (entry.isFile()) {
+      return true;
+    }
+
+    if (entry.isDirectory() && directoryContainsFiles(path.join(dirPath, entry.name))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export async function createMongoDump(config: Config): Promise<DumpResult> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const backupDir = path.join(process.cwd(), "backups");
@@ -49,6 +63,16 @@ export async function createMongoDump(config: Config): Promise<DumpResult> {
 
     mongodump.on("close", (code) => {
       if (code === 0) {
+        if (!fs.existsSync(outputPath) || !directoryContainsFiles(outputPath)) {
+          reject(
+            new Error(
+              `mongodump completed without producing backup files for database "${config.mongodb.database}". ` +
+                "Verify MONGODB_DATABASE and make sure the database contains at least one collection."
+            )
+          );
+          return;
+        }
+
         console.log("✅ mongodump completed successfully");
         resolve({
           outputPath,

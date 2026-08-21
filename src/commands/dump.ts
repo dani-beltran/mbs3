@@ -1,6 +1,7 @@
 import { loadConfig } from "../config";
-import { cleanupLocalBackup, createMongoDump } from "../mongo/mongodump";
+import { cleanupLocalBackup, createMongoDump, DumpResult } from "../mongo/mongodump";
 import { uploadToS3 } from "../s3/s3-upload";
+import { create as tarCreate} from "tar";
 
 export async function runDump(options: { keepLocal: boolean; bucket?: string; prefix?: string; database?: string }): Promise<void> {
   const startTime = Date.now();
@@ -17,11 +18,14 @@ export async function runDump(options: { keepLocal: boolean; bucket?: string; pr
 
     // Create mongodump
     const dumpResult = await createMongoDump(config);
-    console.log("");
+
+    // Compress the dump
+    console.log("Compressing the dump...");
+    const compressedDumpResult = await compressDump(dumpResult);
+    console.log(`✅ Compressed dump created at: ${compressedDumpResult.outputPath}`);
 
     // Upload to S3
-    const uploadResult = await uploadToS3(config, dumpResult);
-    console.log("");
+    const uploadResult = await uploadToS3(config, compressedDumpResult);
 
     // Cleanup local backup unless --keep-local is specified
     if (!options.keepLocal) {
@@ -40,4 +44,20 @@ export async function runDump(options: { keepLocal: boolean; bucket?: string; pr
     console.error("\n❌ Backup failed:", error instanceof Error ? error.message : error);
     process.exit(1);
   }
+}
+
+function compressDump(dumpResult: DumpResult): Promise<DumpResult> {
+  return new Promise((resolve, reject) => {
+    const outputFilePath = `${dumpResult.outputPath}.tar.gz`;
+    tarCreate(
+      {
+        gzip: true,
+        file: outputFilePath,
+        cwd: dumpResult.outputPath,
+      },
+      ["."]
+    )
+      .then(() => resolve({ ...dumpResult, outputPath: outputFilePath }))
+      .catch((err: Error) => reject(err));
+  });
 }
